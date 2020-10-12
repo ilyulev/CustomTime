@@ -25,7 +25,7 @@ func (d *JSONTime) UnmarshalJSON(b []byte) (err error) {
 	}
 
 	//attempt 2 - datetime with milliseconds format
-	t, err = time.Parse("\""+"2006-01-02T15:04:05.000"+"\"", s)
+	t, err = time.Parse("\""+"2006-01-02T15:04:05.999999999"+"\"", s)
 	if err == nil {
 		*d = JSONTime{t}
 		return

@@ -14,9 +14,9 @@ func Test(t *testing.T) {
 		expectedCust time.Time
 	}{
 		{
-			input:        `{"t1":"2020-09-22T08:26:52.8585767+12:00","t2":"2020-09-15T14:45:33.845"}`,
+			input:        `{"t1":"2020-09-22T08:26:52.8585767+12:00","t2":"2020-09-15T14:45:33.3034643"}`,
 			expectedRFC:  time.Date(2020, time.September, 22, 8, 26, 52, 858576700, loc),
-			expectedCust: time.Date(2020, time.September, 15, 14, 45, 33, 845000000, time.UTC),
+			expectedCust: time.Date(2020, time.September, 15, 14, 45, 33, 303464300, time.UTC),
 		},
 	}
 	for _, test := range tests {
@@ -33,7 +33,7 @@ func Test(t *testing.T) {
 				t.Errorf("expected RFC3339 of %v, got %v", test.expectedRFC, e.T1)
 			}
 			if !test.expectedCust.Equal(time.Time(e.T2.Time)) {
-				t.Errorf("expected \"2006-01-02T15:04:05.000\" of %v, got %v", test.expectedCust, e.T2)
+				t.Errorf("expected \"2006-01-02T15:04:05.0000000\" of %v, got %v", test.expectedCust, e.T2)
 			}
 		})
 	}
