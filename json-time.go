@@ -16,7 +16,7 @@ func (d JSONTime) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON handles incoming JSON.
 func (d *JSONTime) UnmarshalJSON(b []byte) (err error) {
 	s := string(b)
-	fmt.Println(s)
+	//	fmt.Println(s)
 	//attempt 1 - RFC3339 format
 	t, err := time.Parse("\""+time.RFC3339+"\"", s)
 	if err == nil {
@@ -26,6 +26,13 @@ func (d *JSONTime) UnmarshalJSON(b []byte) (err error) {
 
 	//attempt 2 - datetime with milliseconds format
 	t, err = time.Parse("\""+"2006-01-02T15:04:05.999999999"+"\"", s)
+	if err == nil {
+		*d = JSONTime{t}
+		return
+	}
+
+	//attempt 3 - sql server
+	t, err = time.Parse("\""+"2006-01-02T15:04:05"+"\"", s)
 	if err == nil {
 		*d = JSONTime{t}
 		return
