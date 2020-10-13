@@ -2,8 +2,14 @@ package jsontime
 
 import (
 	"encoding/json"
+	"fmt"
+	"reflect"
 	"testing"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
 func Test(t *testing.T) {
@@ -43,4 +49,17 @@ func Test(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestUnmarshal(t *testing.T) {
+
+	av := &dynamodb.AttributeValue{S: aws.String("2020-09-15T14:45:33Z")}
+
+	actual := JSONTime{}
+	expect := time.Date(2020, time.September, 15, 14, 45, 33, 0, time.UTC)
+	err := dynamodbattribute.Unmarshal(av, &actual)
+	fmt.Println(err, reflect.DeepEqual(expect, actual))
+
+	// Output:
+	// <nil> true
 }
