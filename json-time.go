@@ -3,6 +3,8 @@ package jsontime
 import (
 	"fmt"
 	"time"
+
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 // JSONTime converts a time from a different string formats to time.Time
@@ -38,4 +40,11 @@ func (d *JSONTime) UnmarshalJSON(b []byte) (err error) {
 		return
 	}
 	return fmt.Errorf("No suitable format found for a string %s", s)
+}
+
+//MarshalDynamoDBAttributeValue marshals objexct to a dynamodb attribute
+func (d *JSONTime) MarshalDynamoDBAttributeValue(av *dynamodb.AttributeValue) error {
+	t := d.Time.Format(time.RFC3339)
+	av.S = &t
+	return nil
 }
