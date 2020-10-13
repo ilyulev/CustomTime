@@ -39,6 +39,12 @@ func (d *JSONTime) UnmarshalJSON(b []byte) (err error) {
 		*d = JSONTime{t}
 		return
 	}
+	//attempt 4 - sql server with Z
+	t, err = time.Parse("\""+"2006-01-02T15:04:05Z"+"\"", s)
+	if err == nil {
+		*d = JSONTime{t}
+		return
+	}
 	return fmt.Errorf("No suitable format found for a string %s", s)
 }
 
