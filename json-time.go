@@ -28,6 +28,12 @@ func (d *JSONTime) tryParse(s string) (err error) {
 		*d = JSONTime{t}
 		return
 	}
+	//attempt 1.5 - RFC3339Nano format
+	t, err = time.Parse(time.RFC3339Nano, s)
+	if err == nil {
+		*d = JSONTime{t}
+		return
+	}
 
 	//attempt 2 - datetime with milliseconds format
 	t, err = time.Parse("2006-01-02T15:04:05.999999999", s)
@@ -54,7 +60,7 @@ func (d *JSONTime) tryParse(s string) (err error) {
 
 //MarshalDynamoDBAttributeValue marshals object to a dynamodb attribute
 func (d *JSONTime) MarshalDynamoDBAttributeValue(av *dynamodb.AttributeValue) error {
-	t := d.Time.Format(time.RFC3339)
+	t := d.Time.Format(time.RFC3339Nano)
 	av.S = &t
 	return nil
 }
