@@ -16,9 +16,11 @@ func (d JSONTime) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON handles incoming JSON.
-func (d *JSONTime) UnmarshalJSON(b []byte) (err error) {
-	s := string(b)
-	//	fmt.Println(s)
+func (d *JSONTime) UnmarshalJSON(b []byte) error {
+	return d.tryParse(string(b))
+}
+
+func (d *JSONTime) tryParse(s string) (err error) {
 	//attempt 1 - RFC3339 format
 	t, err := time.Parse("\""+time.RFC3339+"\"", s)
 	if err == nil {
@@ -45,12 +47,22 @@ func (d *JSONTime) UnmarshalJSON(b []byte) (err error) {
 		*d = JSONTime{t}
 		return
 	}
-	return fmt.Errorf("No suitable format found for a string %s", s)
+	err = fmt.Errorf("No suitable format found for a string %s", s)
+	return
 }
 
-//MarshalDynamoDBAttributeValue marshals objexct to a dynamodb attribute
+//MarshalDynamoDBAttributeValue marshals object to a dynamodb attribute
 func (d *JSONTime) MarshalDynamoDBAttributeValue(av *dynamodb.AttributeValue) error {
 	t := d.Time.Format(time.RFC3339)
 	av.S = &t
 	return nil
+}
+
+//UnmarshalDynamoDBAttributeValue marshals object from a dynamodb attribute
+func (d *JSONTime) UnmarshalDynamoDBAttributeValue(av *dynamodb.AttributeValue) error {
+	if av.S == nil {
+		return nil
+	}
+
+	return d.tryParse(*av.S)
 }
