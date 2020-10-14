@@ -23,8 +23,8 @@ func Test(t *testing.T) {
 	}{
 		{
 			input:        `{"t1":"2020-09-21T20:26:52.8585767","t2":"2020-09-15T14:45:33.3034643","t3":"2020-09-15T14:45:33Z"}`,
-			expectedRFC:  time.Date(2020, time.September, 22, 8, 26, 52, 858576700, loc),
-			expectedCust: time.Date(2020, time.September, 15, 14, 45, 33, 303464300, time.UTC),
+			expectedRFC:  time.Date(2020, time.September, 21, 20, 26, 52, 858576700, loc),
+			expectedCust: time.Date(2020, time.September, 15, 14, 45, 33, 303464300, loc),
 			expectedSQL:  time.Date(2020, time.September, 15, 14, 45, 33, 0, time.UTC),
 		},
 	}
