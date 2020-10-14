@@ -14,6 +14,7 @@ import (
 
 func Test(t *testing.T) {
 	loc, _ := time.LoadLocation("Pacific/Auckland")
+	time.Local = loc
 	tests := []struct {
 		input        string
 		expectedRFC  time.Time
@@ -21,7 +22,7 @@ func Test(t *testing.T) {
 		expectedSQL  time.Time
 	}{
 		{
-			input:        `{"t1":"2020-09-22T08:26:52.8585767+12:00","t2":"2020-09-15T14:45:33.3034643","t3":"2020-09-15T14:45:33Z"}`,
+			input:        `{"t1":"2020-09-21T20:26:52.8585767","t2":"2020-09-15T14:45:33.3034643","t3":"2020-09-15T14:45:33Z"}`,
 			expectedRFC:  time.Date(2020, time.September, 22, 8, 26, 52, 858576700, loc),
 			expectedCust: time.Date(2020, time.September, 15, 14, 45, 33, 303464300, time.UTC),
 			expectedSQL:  time.Date(2020, time.September, 15, 14, 45, 33, 0, time.UTC),
@@ -52,8 +53,9 @@ func Test(t *testing.T) {
 }
 
 func TestUnmarshal(t *testing.T) {
-
-	av := &dynamodb.AttributeValue{S: aws.String("2020-09-15T14:45:33Z")}
+	loc, _ := time.LoadLocation("Pacific/Auckland")
+	time.Local = loc
+	av := &dynamodb.AttributeValue{S: aws.String("2020-09-15T14:45:33")}
 
 	actual := JSONTime{}
 	expect := time.Date(2020, time.September, 15, 14, 45, 33, 0, time.UTC)
