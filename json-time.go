@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // JSONTime converts a time from a different string formats to time.Time
@@ -19,6 +20,21 @@ func (d JSONTime) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON handles incoming JSON.
 func (d *JSONTime) UnmarshalJSON(b []byte) error {
 	return d.tryParse(strings.Trim(string(b), "\""))
+}
+
+// MarshalBSON outputs BSON for MongoDB.
+func (d JSONTime) MarshalBSON() ([]byte, error) {
+	return []byte("\"" + d.Time.Local().Format(time.RFC3339Nano) + "\""), nil
+}
+
+// MarshalBSON outputs BSON for MongoDB.
+func (d JSONTime) UnmarshalBSON(b []byte) error {
+	s := ""
+	err := bson.Unmarshal(b, &s)
+	if err != nil {
+		return err
+	}
+	return d.tryParse(strings.Trim(s, "\""))
 }
 
 func (d *JSONTime) tryParse(s string) (err error) {
