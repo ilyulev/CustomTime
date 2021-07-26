@@ -24,13 +24,26 @@ func (d *JSONTime) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalBSON outputs BSON for MongoDB.
-func (d JSONTime) MarshalBSONValue() (bsontype.Type, []byte, error) {
-	return bsontype.String, bsoncore.AppendString(nil, d.Local().Format(time.RFC3339Nano)), nil
+func (d *JSONTime) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	if d != nil {
+		return bsontype.String, bsoncore.AppendString(nil, d.Local().Format(time.RFC3339Nano)), nil
+	}
+	return bsontype.Null, []byte{}, nil
 }
 
 // MarshalBSON outputs BSON for MongoDB.
-func (d JSONTime) UnmarshalBSONValue(bsonType bsontype.Type, data []byte) error {
-	return d.tryParse(strings.Trim(string(data), "\""))
+func (d *JSONTime) UnmarshalBSONValue(bsonType bsontype.Type, data []byte) error {
+	//val := string(data)
+	if bsonType == bsontype.Null || len(data) == 0 {
+		return nil
+	}
+	t, _, ok := bsoncore.ReadTime(data)
+	if !ok {
+		return fmt.Errorf("cannot parse time")
+	}
+	*d = JSONTime{t}
+	return nil
+	//return d.tryParse(strings.TrimSpace(strings.Trim(val, "\"")))
 }
 
 func (d *JSONTime) tryParse(s string) (err error) {

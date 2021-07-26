@@ -71,18 +71,40 @@ func TestMarshalBSON(t *testing.T) {
 	loc, _ := time.LoadLocation("Pacific/Auckland")
 	time.Local = loc
 
-	//	actual := JSONTime{}
 	expect := time.Date(2020, time.September, 15, 14, 45, 33, 0, time.UTC)
-	av := TestBSON{T: JSONTime{expect}}
-	//av := TestBSON{T: expect}
+	av := TestBSON{T: &JSONTime{expect}}
 	v, err := bson.Marshal(av)
-	fmt.Println(err, string(v))
+	if err != nil {
+		fmt.Println(err, string(v))
+		t.Fail()
+	}
+	err = bson.Unmarshal(v, &av)
 
-	// Output:
-	// <nil> true
+	if err != nil {
+		fmt.Println(err, av)
+		t.Fail()
+	}
+}
+
+func TestMarshalEmptyBSON(t *testing.T) {
+	loc, _ := time.LoadLocation("Pacific/Auckland")
+	time.Local = loc
+
+	av := TestBSON{T: nil}
+	v, err := bson.Marshal(av)
+	if err != nil {
+		fmt.Println(err, string(v))
+		t.Fail()
+	}
+	err = bson.Unmarshal(v, &av)
+
+	if err != nil {
+		fmt.Println(err, av)
+		t.Fail()
+	}
 }
 
 type TestBSON struct {
-	T JSONTime `bson:"t"`
+	T *JSONTime `bson:"t"`
 	//T time.Time `bson:"t"`
 }
