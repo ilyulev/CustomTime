@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func Test(t *testing.T) {
@@ -64,4 +65,24 @@ func TestUnmarshal(t *testing.T) {
 
 	// Output:
 	// <nil> true
+}
+
+func TestMarshalBSON(t *testing.T) {
+	loc, _ := time.LoadLocation("Pacific/Auckland")
+	time.Local = loc
+
+	//	actual := JSONTime{}
+	expect := time.Date(2020, time.September, 15, 14, 45, 33, 0, time.UTC)
+	av := TestBSON{T: JSONTime{expect}}
+	//av := TestBSON{T: expect}
+	v, err := bson.Marshal(av)
+	fmt.Println(err, string(v))
+
+	// Output:
+	// <nil> true
+}
+
+type TestBSON struct {
+	T JSONTime `bson:"t"`
+	//T time.Time `bson:"t"`
 }

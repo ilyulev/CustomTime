@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsontype"
 )
 
 // JSONTime converts a time from a different string formats to time.Time
@@ -23,18 +23,13 @@ func (d *JSONTime) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalBSON outputs BSON for MongoDB.
-func (d JSONTime) MarshalBSON() ([]byte, error) {
-	return []byte("\"" + d.Time.Local().Format(time.RFC3339Nano) + "\""), nil
+func (d JSONTime) MarshalBSONValue() (bsontype.Type, []byte, error) {
+	return bsontype.String, []byte("\"" + d.Local().Format(time.RFC3339Nano) + "\""), nil
 }
 
 // MarshalBSON outputs BSON for MongoDB.
-func (d JSONTime) UnmarshalBSON(b []byte) error {
-	s := ""
-	err := bson.Unmarshal(b, &s)
-	if err != nil {
-		return err
-	}
-	return d.tryParse(strings.Trim(s, "\""))
+func (d JSONTime) UnmarshalBSONValue(bsonType bsontype.Type, data []byte) error {
+	return d.tryParse(strings.Trim(string(data), "\""))
 }
 
 func (d *JSONTime) tryParse(s string) (err error) {
@@ -70,7 +65,7 @@ func (d *JSONTime) tryParse(s string) (err error) {
 		*d = JSONTime{t}
 		return
 	}
-	err = fmt.Errorf("No suitable format found for a string %s", s)
+	err = fmt.Errorf("no suitable format found for a string %s", s)
 	return
 }
 
